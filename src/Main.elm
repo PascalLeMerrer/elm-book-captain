@@ -68,7 +68,7 @@ update computer model =
                     Spaceship.update computer model.spaceship
 
                 updatedAsteroids =
-                    Asteroids.update model.asteroids
+                    Asteroids.update computer model.asteroids
             in
             model
                 |> withSpaceship updatedSpaceship
