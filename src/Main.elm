@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Asteroids
 import Playground exposing (..)
 import Spaceship
 
@@ -14,9 +15,15 @@ type State
 
 
 type alias Model =
-    { spaceship : Spaceship.Model
+    { asteroids : Asteroids.Model
+    , spaceship : Spaceship.Model
     , state : State
     }
+
+
+withAsteroids : Asteroids.Model -> Model -> Model
+withAsteroids asteroids model =
+    { model | asteroids = asteroids }
 
 
 withSpaceship : Spaceship.Model -> Model -> Model
@@ -26,7 +33,8 @@ withSpaceship spaceship model =
 
 init : Model
 init =
-    { spaceship = Spaceship.init
+    { asteroids = Asteroids.init
+    , spaceship = Spaceship.init
     , state = Home
     }
 
@@ -58,9 +66,13 @@ update computer model =
             let
                 updatedSpaceship =
                     Spaceship.update computer model.spaceship
+
+                updatedAsteroids =
+                    Asteroids.update model.asteroids
             in
             model
                 |> withSpaceship updatedSpaceship
+                |> withAsteroids updatedAsteroids
 
 
 
@@ -79,6 +91,7 @@ view computer model =
         Playing ->
             [ viewBackground computer
             , Spaceship.view model.spaceship
+            , Asteroids.view model.asteroids
             ]
 
 
