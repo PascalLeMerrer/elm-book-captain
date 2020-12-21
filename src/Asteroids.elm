@@ -21,19 +21,19 @@ speed =
     3
 
 
+{-| The number of ticks between two asteroid apparitions
+-}
+intervalBetweenAsteroids =
+    200
+
+
 type alias Model =
     List Asteroid
 
 
 init : Model
 init =
-    [ { x = 0
-      , y = 300
-      }
-    , { x = 200
-      , y = 250
-      }
-    ]
+    []
 
 
 update : Computer -> Model -> Model
@@ -46,6 +46,29 @@ update computer model =
 updateAsteroid : Asteroid -> Asteroid
 updateAsteroid asteroid =
     { asteroid | y = asteroid.y - speed }
+
+
+{-| Adds a new asteroid at a pseudo-random place on top of the screen, at regular time intervals
+-}
+spawn : Computer -> Int -> Int -> Model -> Model
+spawn computer ticks seed model =
+    if modBy intervalBetweenAsteroids ticks == 0 then
+        let
+            x =
+                (cos <| toFloat ticks * toFloat seed) * (computer.screen.width / 2 - width * 2) + width
+
+            y =
+                computer.screen.top - height
+
+            newAsteroid =
+                { x = x
+                , y = y
+                }
+        in
+        newAsteroid :: model
+
+    else
+        model
 
 
 view : Model -> Shape

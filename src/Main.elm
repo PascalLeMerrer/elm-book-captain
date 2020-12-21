@@ -16,8 +16,10 @@ type State
 
 type alias Model =
     { asteroids : Asteroids.Model
+    , seed : Int
     , spaceship : Spaceship.Model
     , state : State
+    , ticks : Int
     }
 
 
@@ -26,16 +28,33 @@ withAsteroids asteroids model =
     { model | asteroids = asteroids }
 
 
+withNextTick : Model -> Model
+withNextTick model =
+    { model | ticks = model.ticks + 1 }
+
+
+withSeed : Int -> Model -> Model
+withSeed seed model =
+    { model | seed = seed }
+
+
 withSpaceship : Spaceship.Model -> Model -> Model
 withSpaceship spaceship model =
     { model | spaceship = spaceship }
+
+
+withState : State -> Model -> Model
+withState state model =
+    { model | state = state }
 
 
 init : Model
 init =
     { asteroids = Asteroids.init
     , spaceship = Spaceship.init
+    , seed = 0
     , state = Home
+    , ticks = 0
     }
 
 
@@ -51,16 +70,18 @@ update computer model =
                 let
                     spaceshipNewY =
                         computer.screen.bottom + Spaceship.height / 2
+
+                    randomValue =
+                        computer.mouse.x * computer.mouse.y * toFloat model.ticks |> round
                 in
-                { model
-                    | state = Playing
-                    , spaceship =
-                        model.spaceship
-                            |> Spaceship.moveToY spaceshipNewY
-                }
+                model
+                    |> withState Playing
+                    |> withSpaceship (Spaceship.moveToY spaceshipNewY model.spaceship)
+                    |> withNextTick
+                    |> withSeed randomValue
 
             else
-                model
+                model |> withNextTick
 
         Playing ->
             let
@@ -68,11 +89,14 @@ update computer model =
                     Spaceship.update computer model.spaceship
 
                 updatedAsteroids =
-                    Asteroids.update computer model.asteroids
+                    model.asteroids
+                        |> Asteroids.update computer
+                        |> Asteroids.spawn computer model.ticks model.seed
             in
             model
                 |> withSpaceship updatedSpaceship
                 |> withAsteroids updatedAsteroids
+                |> withNextTick
 
 
 
