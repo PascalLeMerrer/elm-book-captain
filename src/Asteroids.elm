@@ -1,11 +1,13 @@
 module Asteroids exposing (..)
 
+import Physics exposing (Body)
 import Playground exposing (Computer, Shape, group, image, move)
 
 
 type alias Asteroid =
     { x : Float
     , y : Float
+    , body : Body
     }
 
 
@@ -46,6 +48,7 @@ update computer model =
 updateAsteroid : Asteroid -> Asteroid
 updateAsteroid asteroid =
     { asteroid | y = asteroid.y - speed }
+        |> Physics.updateBody
 
 
 {-| Adds a new asteroid at a pseudo-random place on top of the screen, at regular time intervals
@@ -63,6 +66,7 @@ spawn computer ticks seed model =
             newAsteroid =
                 { x = x
                 , y = y
+                , body = Physics.createBody x y (width - 10) (height - 20)
                 }
         in
         newAsteroid :: model
@@ -79,5 +83,8 @@ view model =
 
 viewAsteroid : Asteroid -> Shape
 viewAsteroid asteroid =
-    image width height "http://localhost:9000/captain/asteroid.png"
-        |> move asteroid.x asteroid.y
+    group
+        [ Physics.viewBody asteroid
+        , image width height "http://localhost:9000/captain/asteroid.png"
+            |> move asteroid.x asteroid.y
+        ]
