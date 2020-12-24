@@ -1,6 +1,7 @@
 module Spaceship exposing (Model, height, init, moveToY, update, view)
 
-import Playground exposing (Computer, Shape, image, move)
+import Physics exposing (Body)
+import Playground exposing (Computer, Shape, group, image, move)
 
 
 width =
@@ -18,6 +19,7 @@ speed =
 type alias Model =
     { x : Float
     , y : Float
+    , body : Body
     }
 
 
@@ -25,21 +27,25 @@ init : Model
 init =
     { x = 0
     , y = 0
+    , body = Physics.createBody 0 0 width height
     }
 
 
 moveToY : Float -> Model -> Model
 moveToY y spaceship =
     { spaceship | y = y }
+        |> Physics.updateBody
 
 
 update : Computer -> Model -> Model
 update computer model =
     if computer.keyboard.left then
         moveLeft computer model
+            |> Physics.updateBody
 
     else if computer.keyboard.right then
         moveRight computer model
+            |> Physics.updateBody
 
     else
         model

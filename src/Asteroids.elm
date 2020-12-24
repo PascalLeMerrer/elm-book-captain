@@ -85,8 +85,5 @@ view model =
 
 viewAsteroid : Asteroid -> Shape
 viewAsteroid asteroid =
-    group
-        [ Physics.viewBody asteroid
-        , image width height "http://localhost:9000/captain/asteroid.png"
-            |> move asteroid.x asteroid.y
-        ]
+    image width height "http://localhost:9000/captain/asteroid.png"
+        |> move asteroid.x asteroid.y

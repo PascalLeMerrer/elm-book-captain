@@ -13,6 +13,7 @@ main =
 
 type State
     = Home
+    | GameOver
     | Playing
 
 
@@ -92,6 +93,9 @@ update computer model =
             else
                 model |> withNextTick
 
+        GameOver ->
+            model
+
         Playing ->
             let
                 updatedSpaceship =
@@ -112,6 +116,7 @@ update computer model =
                 |> withAsteroids updatedAsteroids
                 |> withLasers updatedLasers
                 |> destroidAsteroids
+                |> detectCollision
                 |> withNextTick
 
 
@@ -138,6 +143,22 @@ detectHits lasers asteroid =
     { asteroid | isHit = isHit }
 
 
+detectCollision : Model -> Model
+detectCollision model =
+    if isCrashing model then
+        model |> withState GameOver
+
+    else
+        model
+
+
+{-| Returns true when the spaceship collides with an asteroid
+-}
+isCrashing : Model -> Bool
+isCrashing model =
+    List.any (isColliding model.spaceship) model.asteroids
+
+
 
 -- VIEW --
 
@@ -149,6 +170,11 @@ view computer model =
             [ viewBackground computer
             , viewTitle
             , viewSubtitle
+            ]
+
+        GameOver ->
+            [ viewBackground computer
+            , viewGameOver
             ]
 
         Playing ->
@@ -167,6 +193,12 @@ viewBackground computer =
             computer.screen.height
             "http://localhost:9000/captain/starfield.png"
         ]
+
+
+viewGameOver : Shape
+viewGameOver =
+    words white "Game Over"
+        |> scale 3
 
 
 viewTitle : Shape

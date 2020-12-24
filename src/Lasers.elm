@@ -78,8 +78,5 @@ view model =
 
 viewLaser : Laser -> Shape
 viewLaser laser =
-    group
-        [ Physics.viewBody laser
-        , image width height "http://localhost:9000/captain/laser.png"
-            |> move laser.x laser.y
-        ]
+    image width height "http://localhost:9000/captain/laser.png"
+        |> move laser.x laser.y
