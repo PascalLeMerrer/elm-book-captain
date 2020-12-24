@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Asteroids
+import Lasers
 import Playground exposing (..)
 import Spaceship
 
@@ -16,6 +17,7 @@ type State
 
 type alias Model =
     { asteroids : Asteroids.Model
+    , lasers : Lasers.Model
     , seed : Int
     , spaceship : Spaceship.Model
     , state : State
@@ -26,6 +28,11 @@ type alias Model =
 withAsteroids : Asteroids.Model -> Model -> Model
 withAsteroids asteroids model =
     { model | asteroids = asteroids }
+
+
+withLasers : Lasers.Model -> Model -> Model
+withLasers lasers model =
+    { model | lasers = lasers }
 
 
 withNextTick : Model -> Model
@@ -51,6 +58,7 @@ withState state model =
 init : Model
 init =
     { asteroids = Asteroids.init
+    , lasers = Lasers.init
     , spaceship = Spaceship.init
     , seed = 0
     , state = Home
@@ -92,10 +100,16 @@ update computer model =
                     model.asteroids
                         |> Asteroids.update computer
                         |> Asteroids.spawn computer model.ticks model.seed
+
+                updatedLasers =
+                    model.lasers
+                        |> Lasers.update computer
+                        |> Lasers.fire computer model.ticks model.spaceship.x model.spaceship.y
             in
             model
                 |> withSpaceship updatedSpaceship
                 |> withAsteroids updatedAsteroids
+                |> withLasers updatedLasers
                 |> withNextTick
 
 
@@ -114,6 +128,7 @@ view computer model =
 
         Playing ->
             [ viewBackground computer
+            , Lasers.view model.lasers
             , Spaceship.view model.spaceship
             , Asteroids.view model.asteroids
             ]
