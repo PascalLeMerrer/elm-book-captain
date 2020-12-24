@@ -1,11 +1,13 @@
 module Lasers exposing (..)
 
+import Physics exposing (Body)
 import Playground exposing (Computer, Shape, group, image, move)
 
 
 type alias Laser =
     { x : Float
     , y : Float
+    , body : Body
     }
 
 
@@ -42,6 +44,7 @@ updateLaser laser =
     { laser
         | y = laser.y + speed
     }
+        |> Physics.updateBody
 
 
 intervalBetweenFireshots =
@@ -58,6 +61,7 @@ fire computer ticks x y model =
             newLaser =
                 { x = x
                 , y = y
+                , body = Physics.createBody x y width height
                 }
         in
         newLaser :: model
@@ -74,5 +78,8 @@ view model =
 
 viewLaser : Laser -> Shape
 viewLaser laser =
-    image width height "http://localhost:9000/captain/laser.png"
-        |> move laser.x laser.y
+    group
+        [ Physics.viewBody laser
+        , image width height "http://localhost:9000/captain/laser.png"
+            |> move laser.x laser.y
+        ]
