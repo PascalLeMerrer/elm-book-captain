@@ -1,7 +1,8 @@
 module Main exposing (main)
 
-import Asteroids
+import Asteroids exposing (Asteroid)
 import Lasers
+import Physics exposing (isColliding)
 import Playground exposing (..)
 import Spaceship
 
@@ -110,7 +111,31 @@ update computer model =
                 |> withSpaceship updatedSpaceship
                 |> withAsteroids updatedAsteroids
                 |> withLasers updatedLasers
+                |> destroidAsteroids
                 |> withNextTick
+
+
+{-| Remove from game the asteroids hit by a laser ray
+-}
+destroidAsteroids : Model -> Model
+destroidAsteroids model =
+    let
+        remainingAsteroids : List Asteroid
+        remainingAsteroids =
+            model.asteroids
+                |> List.map (detectHits model.lasers)
+                |> List.filter (not << .isHit)
+    in
+    model |> withAsteroids remainingAsteroids
+
+
+detectHits : Lasers.Model -> Asteroid -> Asteroid
+detectHits lasers asteroid =
+    let
+        isHit =
+            List.any (isColliding asteroid) lasers
+    in
+    { asteroid | isHit = isHit }
 
 
 

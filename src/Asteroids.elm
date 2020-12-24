@@ -8,6 +8,7 @@ type alias Asteroid =
     { x : Float
     , y : Float
     , body : Body
+    , isHit : Bool
     }
 
 
@@ -67,6 +68,7 @@ spawn computer ticks seed model =
                 { x = x
                 , y = y
                 , body = Physics.createBody x y (width - 10) (height - 20)
+                , isHit = False
                 }
         in
         newAsteroid :: model
